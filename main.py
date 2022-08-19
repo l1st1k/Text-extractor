@@ -1,5 +1,7 @@
 from dotenv import dotenv_values
 from fastapi import FastAPI
+from models import *
+from repository import *
 from mongoengine import connect
 
 app = FastAPI()
@@ -12,6 +14,13 @@ async def root():
     return {"message": "Hello World"}
 
 
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
+@app.get(
+    "/images",
+    response_model=ImagesRead,
+    description="List all the images",
+    tags=["image"]
+)
+def _list_people():
+    return ImageRepository.list()
+
+
