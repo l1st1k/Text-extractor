@@ -6,11 +6,6 @@ from exceptions import *
 app = FastAPI()
 
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-
 @app.get(
     "/images",
     response_model=ImagesRead,

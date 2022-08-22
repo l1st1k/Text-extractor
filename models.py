@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from bson.binary import Binary
+from fastapi import UploadFile, File
 from typing import Optional, List
 import pydantic
 
@@ -14,7 +15,7 @@ class ImageFields:
         min_length=36,
         max_length=36
     )
-    image = Field(
+    image = File(
         description="The picture by itself"
     )
     title = Field(
@@ -36,7 +37,7 @@ class ImageFields:
 
 class ImageUpdate(BaseModel):
     """Body of Image PATCH requests"""
-    image: Optional[Binary] = ImageFields.image
+    image: Optional[UploadFile] = ImageFields.image
     title: Optional[str] = ImageFields.title
     description: Optional[str] = ImageFields.description
 
@@ -45,7 +46,7 @@ class ImageUpdate(BaseModel):
 
 class ImageCreate(ImageUpdate):
     """Body of Image POST requests"""
-    image: Binary = ImageFields.image
+    image: UploadFile = ImageFields.image
     title: str = ImageFields.title
     # Description remains Optional, so is not required to re-declare
 
@@ -53,8 +54,8 @@ class ImageCreate(ImageUpdate):
 class ImageRead(ImageCreate):
     """Body of Image GET and POST responses"""
     image_id: str = ImageFields.image_id
-    image: Binary = ImageFields.image
-    title: str = ImageFields.title
+    # image: File = ImageFields.image
+    # title: str = ImageFields.title
     description: str = ImageFields.description
 
     @pydantic.root_validator(pre=True)
