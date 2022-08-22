@@ -1,13 +1,9 @@
-from dotenv import dotenv_values
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 from models import *
 from repository import *
 from exceptions import *
-from mongoengine import connect
 
 app = FastAPI()
-config = dotenv_values(".env")
-# connect(host=f"mongodb://{config['MONGO_USER']}:{config['MONGO_PASS']}@127.0.0.1:27017/{config['MONGO_DB']}?authSource=my_db")
 
 
 @app.get("/")
@@ -34,4 +30,16 @@ def _list_images():
 )
 def _get_image(image_id: str):
     return ImageRepository.get(image_id=image_id)
+
+
+@app.post(
+    "/image",
+    description="Create a new image",
+    response_model=ImageRead,
+    status_code=status.HTTP_201_CREATED,
+    responses=get_exception_responses(ImageAlreadyExistsException),
+    tags=["image"]
+)
+def _create_image(create: ImageCreate):
+    return ImageRepository.create(create)
 
