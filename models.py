@@ -15,8 +15,9 @@ class ImageFields:
         min_length=36,
         max_length=36
     )
-    image = File(
-        description="The picture by itself"
+    b64_encoded_string = Field(
+        description="Picture in bytes",
+        default=None
     )
     title = Field(
         description="The title for the picture",
@@ -37,7 +38,7 @@ class ImageFields:
 
 class ImageUpdate(BaseModel):
     """Body of Image PATCH requests"""
-    image: Optional[UploadFile] = ImageFields.image
+    b64_encoded_string: Optional[bytes] = ImageFields.b64_encoded_string
     title: Optional[str] = ImageFields.title
     description: Optional[str] = ImageFields.description
 
@@ -46,16 +47,13 @@ class ImageUpdate(BaseModel):
 
 class ImageCreate(ImageUpdate):
     """Body of Image POST requests"""
-    image: UploadFile = ImageFields.image
     title: str = ImageFields.title
-    # Description remains Optional, so is not required to re-declare
 
 
-class ImageRead(ImageCreate):
+class ImageRead(ImageUpdate):
     """Body of Image GET and POST responses"""
     image_id: str = ImageFields.image_id
-    # image: File = ImageFields.image
-    # title: str = ImageFields.title
+    title: str = ImageFields.title
     description: str = ImageFields.description
 
     @pydantic.root_validator(pre=True)
