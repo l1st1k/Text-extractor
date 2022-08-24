@@ -1,10 +1,10 @@
-from fastapi import FastAPI, status, UploadFile, File
-from fastapi.responses import FileResponse, JSONResponse
-from pydantic.typing import NoneType
+from fastapi import FastAPI, status, UploadFile
+from fastapi.responses import JSONResponse
 
 from models import *
 from repository import *
 from exceptions import *
+from services import *
 from bson.binary import Binary
 import gridfs
 import base64
@@ -35,41 +35,32 @@ def _get_image(image_id: str):
 
 
 @app.post(
-    "/image",
-    description="Create a new image",
-    response_model=ImageRead or JSONResponse,
+    "/upload_image",
+    description="Upload a new image",
     status_code=status.HTTP_201_CREATED,
-    responses=get_exception_responses(ImageAlreadyExistsException),
     tags=["image"]
 )
-def _create_image(create: ImageCreate = DEFAULT_IMAGE_MODEL,
-                  file: UploadFile = File(description="The picture by itself", default=None)):
+def _upload_image(file: UploadFile):
     try:
         # Type check
-        # print(file.filename, file.content_type)
-        # print(file.content_type == "image/jpeg")
-        # print(file.content_type not in ('image/jpeg', 'image/png', 'image/jpg'))
         if file and (file.content_type not in ('image/jpeg', 'image/png', 'image/jpg')):
-            print(True)
             raise TypeError
-        print(create.b64_encoded_string)
-        print(create.title)
-        # User should send only 1 of 2 parameters(picture or b64_string of his picture)
-        if not (file or create.b64_encoded_string):
-            raise ValueError
-        if file and create.b64_encoded_string:
-            raise ValueError
-
         encoded_string: bytes = base64.b64encode(file.file.read())
-        # data = ImageRead()
-        # data.b64_encoded_string = encoded_string
-        response = JSONResponse(content={"message": "HIQ"})
+        data = ImageCreate(image_id=get_uuid())
+        data.b64_encoded_string = encoded_string
+        data.title = file.filename
+        print(data.image_id)
+        response = JSONResponse(content={"message": f"Your image uploaded successfully! If you want to change title "
+                                                    f"from '{data.title}' to another or add some description for that "
+                                                    f"picture, you can update information with the corresponding Update"
+                                                    f" method!",
+                                         "id": data.image_id},
+                                status_code=status.HTTP_201_CREATED)
     except TypeError:
         response = JSONResponse(content={"message": "Picture should be in jpg/jpeg/png format!"},
                                 status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-    except ValueError:
-        response = JSONResponse(content={"message": "You should send 1 of 2 parameters "
-                                                    "(b64_encoded_string or picture by itself)"},
-                                status_code=status.HTTP_406_NOT_ACCEPTABLE)
     return response
+
+
+
 

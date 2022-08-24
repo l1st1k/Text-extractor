@@ -5,7 +5,7 @@ from typing import Optional, List
 import pydantic
 
 
-__all__ = ("ImageUpdate", "ImageCreate", "ImageRead", "ImagesRead", "DEFAULT_IMAGE_MODEL")
+__all__ = ("ImageUpdate", "ImageCreate", "ImageRead", "ImagesRead")
 
 
 class ImageFields:
@@ -38,38 +38,24 @@ class ImageFields:
 
 class ImageUpdate(BaseModel):
     """Body of Image PATCH requests"""
-    b64_encoded_string: Optional[bytes] = ImageFields.b64_encoded_string
     title: Optional[str] = ImageFields.title
     description: Optional[str] = ImageFields.description
 
-    # TEXT EXTRACTING LOGIC (will be soon) TODO logic for text
 
-
-class ImageCreate(ImageUpdate):
+class ImageCreate(BaseModel):
     """Body of Image POST requests"""
+    image_id: str = ImageFields.image_id
     title: str = ImageFields.title
+    b64_encoded_string: bytes = ImageFields.b64_encoded_string
 
 
-class ImageRead(ImageUpdate):
+class ImageRead(BaseModel):
     """Body of Image GET and POST responses"""
     image_id: str = ImageFields.image_id
     title: str = ImageFields.title
     description: str = ImageFields.description
 
-    @pydantic.root_validator(pre=True)
-    def _set_image_id(cls, data):
-        """Swap the field _id to image_id (this could be done with field alias, by setting the field as "_id"
-        and the alias as "image_id", but can be quite confusing)"""
-        document_id = data.get("_id")
-        if document_id:
-            data["image_id"] = document_id
-        return data
-
 
 ImagesRead = List[ImageRead]
 
-DEFAULT_IMAGE_MODEL = ImageCreate(
-    b64_encoded_string=None,
-    title="Unnamed picture =(",
-    description="Empty description =("
-)
+
