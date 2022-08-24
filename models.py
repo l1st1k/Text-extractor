@@ -5,7 +5,7 @@ from typing import Optional, List
 import pydantic
 
 
-__all__ = ("ImageUpdate", "ImageCreate", "ImageRead", "ImagesRead")
+__all__ = ("ImageUpdate", "ImageCreate", "ImageRead", "ImagesRead", "DEFAULT_IMAGE_MODEL")
 
 
 class ImageFields:
@@ -67,3 +67,9 @@ class ImageRead(ImageUpdate):
 
 
 ImagesRead = List[ImageRead]
+
+DEFAULT_IMAGE_MODEL = ImageCreate(
+    b64_encoded_string=None,
+    title="Unnamed picture =(",
+    description="Empty description =("
+)

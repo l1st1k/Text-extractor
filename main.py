@@ -1,5 +1,7 @@
 from fastapi import FastAPI, status, UploadFile, File
 from fastapi.responses import FileResponse, JSONResponse
+from pydantic.typing import NoneType
+
 from models import *
 from repository import *
 from exceptions import *
@@ -40,14 +42,18 @@ def _get_image(image_id: str):
     responses=get_exception_responses(ImageAlreadyExistsException),
     tags=["image"]
 )
-async def _create_image(create: ImageCreate, file: UploadFile = File(description="The picture by itself",
-                                                                     default=None)):
-
+def _create_image(create: ImageCreate = DEFAULT_IMAGE_MODEL,
+                  file: UploadFile = File(description="The picture by itself", default=None)):
     try:
         # Type check
-        if file.content_type not in ['image/jpeg', 'image/png', 'image/jpg']:
+        # print(file.filename, file.content_type)
+        # print(file.content_type == "image/jpeg")
+        # print(file.content_type not in ('image/jpeg', 'image/png', 'image/jpg'))
+        if file and (file.content_type not in ('image/jpeg', 'image/png', 'image/jpg')):
+            print(True)
             raise TypeError
-
+        print(create.b64_encoded_string)
+        print(create.title)
         # User should send only 1 of 2 parameters(picture or b64_string of his picture)
         if not (file or create.b64_encoded_string):
             raise ValueError
@@ -55,9 +61,9 @@ async def _create_image(create: ImageCreate, file: UploadFile = File(description
             raise ValueError
 
         encoded_string: bytes = base64.b64encode(file.file.read())
-        data = ImageRead(*create)
-        data.b64_encoded_string = encoded_string
-        response = data
+        # data = ImageRead()
+        # data.b64_encoded_string = encoded_string
+        response = JSONResponse(content={"message": "HIQ"})
     except TypeError:
         response = JSONResponse(content={"message": "Picture should be in jpg/jpeg/png format!"},
                                 status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
