@@ -5,7 +5,7 @@ from typing import Optional, List
 import pydantic
 
 
-__all__ = ("ImageUpdate", "ImageCreate", "ImageRead", "ImagesRead")
+__all__ = ("ImageUpdate", "ImageCreate", "ImageRead", "ImagesRead", "PictureRead")
 
 
 class ImageFields:
@@ -50,12 +50,16 @@ class ImageCreate(BaseModel):
 
 
 class ImageRead(BaseModel):
-    """Body of Image GET and POST responses"""
+    """Body of Image GET response"""
     image_id: str = ImageFields.image_id
     title: str = ImageFields.title
     description: str = ImageFields.description
 
 
+class PictureRead(BaseModel):
+    """Body of Picture GET response"""
+    image_id: str = ImageFields.image_id
+    b64_encoded_string: bytes = ImageFields.b64_encoded_string
+
+
 ImagesRead = List[ImageRead]
-
-

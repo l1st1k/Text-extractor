@@ -1,5 +1,5 @@
 from fastapi import FastAPI, status, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 
 from models import *
 from repository import *
@@ -25,8 +25,8 @@ def _list_images():
 
 @app.get(
     "/image/{image_id}",
-    response_model=ImageRead,
-    description="Get a single image by its unique ID",
+    response_class=FileResponse,
+    description="Get a single picture by its unique ID",
     responses=get_exception_responses(ImageNotFoundException),
     tags=["image"]
 )
@@ -36,31 +36,10 @@ def _get_image(image_id: str):
 
 @app.post(
     "/upload_image",
+    response_class=JSONResponse,
     description="Upload a new image",
     status_code=status.HTTP_201_CREATED,
     tags=["image"]
 )
 def _upload_image(file: UploadFile):
-    try:
-        # Type check
-        if file and (file.content_type not in ('image/jpeg', 'image/png', 'image/jpg')):
-            raise TypeError
-        encoded_string: bytes = base64.b64encode(file.file.read())
-        data = ImageCreate(image_id=get_uuid())
-        data.b64_encoded_string = encoded_string
-        data.title = file.filename
-        print(data.image_id)
-        response = JSONResponse(content={"message": f"Your image uploaded successfully! If you want to change title "
-                                                    f"from '{data.title}' to another or add some description for that "
-                                                    f"picture, you can update information with the corresponding Update"
-                                                    f" method!",
-                                         "id": data.image_id},
-                                status_code=status.HTTP_201_CREATED)
-    except TypeError:
-        response = JSONResponse(content={"message": "Picture should be in jpg/jpeg/png format!"},
-                                status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-    return response
-
-
-
-
+    return ImageRepository.create(file=file)
