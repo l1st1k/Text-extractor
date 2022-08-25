@@ -1,5 +1,4 @@
 import pydantic
-
 from dotenv import dotenv_values
 
 __all__ = ("mongo_settings",)

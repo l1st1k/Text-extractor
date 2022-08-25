@@ -1,13 +1,13 @@
-import base64
-import os
+from __future__ import annotations
 
+import base64
+
+from fastapi import UploadFile, status
 from fastapi.responses import FileResponse, JSONResponse
-from fastapi import status
 
 from database import collection
-from models import *
-from fastapi import UploadFile
 from exceptions import *
+from models import *
 from services import *
 
 __all__ = ("ImageRepository",)
@@ -49,6 +49,7 @@ class ImageRepository:
             data.b64_encoded_string = encoded_string
             data.title = file.filename
             # text logic
+            # TODO Text extracting logic
 
             # database logic
             document = data.dict()
@@ -66,12 +67,31 @@ class ImageRepository:
                                     status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
         return response
 
-    # @staticmethod
-    # def update(image_id: str, update: ImageUpdate) -> ImageRead:
-    #
-    #     return ImageRead(**updated_document)
-    #
-    # @staticmethod
-    # def delete(image_id: str) -> JSONResponse:
-    #
-    #     return response
+    @staticmethod
+    def update(image_id: str, update: ImageUpdate) -> ImageRead | JSONResponse:
+        """Update an image by giving only the fields to update"""
+        try:
+            document = collection.find_one({"image_id": image_id})
+            if not document:
+                raise ImageNotFoundException(image_id)
+            update_document = update.dict()
+            collection.update_one({"image_id": image_id}, {"$set": update_document})
+            document = collection.find_one({"image_id": image_id})
+            response = ImageRead(**document)
+        except ImageNotFoundException:
+            response = JSONResponse(content={"message": "There is no image with that ID!"},
+                                    status_code=status.HTTP_404_NOT_FOUND)
+        return response
+
+    @staticmethod
+    def delete(image_id: str) -> JSONResponse:
+        try:
+            document = collection.find_one({"image_id": image_id})
+            if not document:
+                raise ImageNotFoundException(image_id)
+            collection.delete_one({"image_id": image_id})
+            response = JSONResponse(content={"message": "Successfully deleted!"}, status_code=status.HTTP_200_OK)
+        except ImageNotFoundException:
+            response = JSONResponse(content={"message": "There is no image with that ID!"},
+                                    status_code=status.HTTP_404_NOT_FOUND)
+        return response

@@ -1,7 +1,7 @@
+import base64
 import os
 from glob import glob
 from uuid import uuid4
-import base64
 
 __all__ = ("get_uuid", "clear_pictures", "b64_to_image")
 

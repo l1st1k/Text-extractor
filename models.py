@@ -1,9 +1,6 @@
-from pydantic import BaseModel, Field
-from bson.binary import Binary
-from fastapi import UploadFile, File
-from typing import Optional, List
-import pydantic
+from typing import List, Optional
 
+from pydantic import BaseModel, Field
 
 __all__ = ("ImageUpdate", "ImageCreate", "ImageRead", "ImagesRead", "PictureRead")
 
