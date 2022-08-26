@@ -61,3 +61,13 @@ def _update_image(image_id: str, update: ImageUpdate):
 )
 def _delete_image(image_id: str):
     return ImageRepository.delete(image_id=image_id)
+
+
+@app.post(
+    "/images/search",
+    response_model=ImagesRead,
+    description="Finds all the images, that have corresponding text on them",
+    tags=["Images"]
+)
+def _search_images(text: TextToFind):
+    return ImageRepository.find(text_to_find=text.text)

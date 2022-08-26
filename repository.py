@@ -98,6 +98,10 @@ class ImageRepository:
 
     @staticmethod
     def delete(image_id: str) -> JSONResponse:
+        """Deletes a single Image by its unique id"""
+        # Deleting previous pictures
+        clear_pictures()
+
         try:
             document = collection.find_one({"image_id": image_id})
             if not document:
@@ -108,3 +112,9 @@ class ImageRepository:
             response = JSONResponse(content={"message": "There is no image with that ID!"},
                                     status_code=status.HTTP_404_NOT_FOUND)
         return response
+
+    @staticmethod
+    def find(text_to_find: str) -> ImagesRead:
+        """Finds images with the corresponding text on them"""
+        cursor = collection.find({"text": {"$regex": text_to_find, "$options": "i"}})
+        return [ImageRead(**document) for document in cursor]

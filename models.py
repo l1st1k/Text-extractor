@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-__all__ = ("ImageUpdate", "ImageCreate", "ImageRead", "ImagesRead",)
+__all__ = ("ImageUpdate", "ImageCreate", "ImageRead", "ImagesRead", "TextToFind",)
 
 
 class ImageFields:
@@ -53,6 +53,15 @@ class ImageRead(BaseModel):
     title: str = ImageFields.title
     description: str = ImageFields.description
     text: str = ImageFields.text
+
+
+class TextToFind(BaseModel):
+    """Body of Text POST requests"""
+    text: str = Field(
+        description="Text to find on the picture",
+        default=None,
+        example="main.py"
+    )
 
 
 ImagesRead = List[ImageRead]
