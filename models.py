@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-__all__ = ("ImageUpdate", "ImageCreate", "ImageRead", "ImagesRead", "PictureRead")
+__all__ = ("ImageUpdate", "ImageCreate", "ImageRead", "ImagesRead",)
 
 
 class ImageFields:
@@ -44,6 +44,7 @@ class ImageCreate(BaseModel):
     image_id: str = ImageFields.image_id
     title: str = ImageFields.title
     b64_encoded_string: bytes = ImageFields.b64_encoded_string
+    text: str = ImageFields.text
 
 
 class ImageRead(BaseModel):
@@ -51,12 +52,7 @@ class ImageRead(BaseModel):
     image_id: str = ImageFields.image_id
     title: str = ImageFields.title
     description: str = ImageFields.description
-
-
-class PictureRead(BaseModel):
-    """Body of Picture GET response"""
-    image_id: str = ImageFields.image_id
-    b64_encoded_string: bytes = ImageFields.b64_encoded_string
+    text: str = ImageFields.text
 
 
 ImagesRead = List[ImageRead]

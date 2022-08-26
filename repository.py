@@ -17,6 +17,10 @@ class ImageRepository:
     @staticmethod
     def list() -> ImagesRead:
         """Retrieve all the available images"""
+        # Deleting previous pictures
+        clear_pictures()
+
+        # Database logic
         cursor = collection.find()
         return [ImageRead(**document) for document in cursor]
 
@@ -44,21 +48,28 @@ class ImageRepository:
             # Type check
             if file and (file.content_type not in ('image/jpeg', 'image/png', 'image/jpg')):
                 raise TypeError
+
+            # Creating the instance
             encoded_string: bytes = base64.b64encode(file.file.read())
             data = ImageCreate(image_id=str(get_uuid()))
             data.b64_encoded_string = encoded_string
             data.title = file.filename
-            # text logic
-            # TODO Text extracting logic
 
-            # database logic
+            # Text extracting logic
+            data.text = get_text_from_image(title=data.title, b64_str=bytes(data.b64_encoded_string))
+
+            # Deleting previous pictures
+            clear_pictures()
+
+            # Database logic
             document = data.dict()
             collection.insert_one(document)
-            # response
+
+            # Response
             response = JSONResponse(
                 content={"message": f"Your image uploaded successfully! If you want to change title "
                                     f"from '{data.title}' to another or add some description for that "
-                                    f"picture, you can update information with the corresponding Update"
+                                    f"picture, you can update information with the corresponding 'Update'"
                                     f" method!",
                          "id": data.image_id},
                 status_code=status.HTTP_201_CREATED)
@@ -70,6 +81,8 @@ class ImageRepository:
     @staticmethod
     def update(image_id: str, update: ImageUpdate) -> ImageRead | JSONResponse:
         """Update an image by giving only the fields to update"""
+        # Deleting previous pictures
+        clear_pictures()
         try:
             document = collection.find_one({"image_id": image_id})
             if not document:
