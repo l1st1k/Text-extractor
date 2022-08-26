@@ -1,10 +1,10 @@
 import base64
 import os
-import pytesseract as tess
-
-from PIL import Image
 from glob import glob
 from uuid import uuid4
+
+import pytesseract as tess
+from PIL import Image
 
 __all__ = ("get_uuid", "clear_pictures", "b64_to_image", "get_text_from_image")
 tess.pytesseract.tesseract_cmd = r'/usr/bin/tesseract'
