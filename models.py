@@ -2,7 +2,13 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-__all__ = ("ImageUpdate", "ImageCreate", "ImageRead", "ImagesRead", "TextToFind",)
+__all__ = (
+    "ImageUpdate",
+    "ImageCreate",
+    "ImageRead",
+    "ImagesRead",
+    "TextToFind",
+)
 
 
 class ImageFields:

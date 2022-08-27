@@ -3,7 +3,7 @@ from fastapi.responses import FileResponse, JSONResponse
 
 from exceptions import *
 from models import *
-from repository import *
+from repository import ImageRepository
 
 app = FastAPI()
 

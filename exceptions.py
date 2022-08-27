@@ -4,12 +4,21 @@ from fastapi import status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-__all__ = ('BaseAPIException', 'ImageNotFoundException', 'ImageAlreadyExistsException', 'get_exception_responses')
+__all__ = (
+    'BaseAPIException',
+    'ImageNotFoundException',
+    'ImageAlreadyExistsException',
+    'get_exception_responses'
+)
 
 
 class BaseError(BaseModel):
-    message: str = Field(description="Error message or description")
-    identifier: str = Field(description="Unique identifier which this error references to")
+    message: str = Field(
+        description="Error message or description"
+    )
+    identifier: str = Field(
+        description="Unique identifier which this error references to"
+    )
 
 
 class NotFoundError(BaseError):
@@ -66,7 +75,8 @@ class ImageAlreadyExistsException(BaseAPIException):
 
 
 def get_exception_responses(*args: Type[BaseAPIException]) -> dict:
-    """Given BaseAPIException classes, return a dict of responses used on FastAPI endpoint definition, with the format:
+    """Given BaseAPIException classes, return a dict of responses
+    used on FastAPI endpoint definition, with the format:
     {statuscode: schema, statuscode: schema, ...}"""
     responses = dict()
     for cls in args:

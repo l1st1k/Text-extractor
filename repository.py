@@ -10,7 +10,9 @@ from exceptions import *
 from models import *
 from services import *
 
-__all__ = ("ImageRepository",)
+__all__ = (
+    "ImageRepository",
+)
 
 
 class ImageRepository:
@@ -46,7 +48,11 @@ class ImageRepository:
         """Upload a picture and return its id"""
         try:
             # Type check
-            if file and (file.content_type not in ('image/jpeg', 'image/png', 'image/jpg')):
+            if file and (file.content_type not in (
+                    'image/jpeg',
+                    'image/png',
+                    'image/jpg')
+            ):
                 raise TypeError
 
             # Creating the instance
@@ -56,7 +62,10 @@ class ImageRepository:
             data.title = file.filename
 
             # Text extracting logic
-            data.text = get_text_from_image(title=data.title, b64_str=bytes(data.b64_encoded_string))
+            data.text = get_text_from_image(
+                title=data.title,
+                b64_str=bytes(data.b64_encoded_string)
+            )
 
             # Deleting previous pictures
             clear_pictures()
@@ -74,8 +83,10 @@ class ImageRepository:
                          "id": data.image_id},
                 status_code=status.HTTP_201_CREATED)
         except TypeError:
-            response = JSONResponse(content={"message": "Picture should be in jpg/jpeg/png format!"},
-                                    status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+            response = JSONResponse(
+                content={"message": "Picture should be in jpg/jpeg/png format!"},
+                status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+            )
         return response
 
     @staticmethod
@@ -88,12 +99,16 @@ class ImageRepository:
             if not document:
                 raise ImageNotFoundException(image_id)
             update_document = update.dict()
-            collection.update_one({"image_id": image_id}, {"$set": update_document})
+            collection.update_one(
+                {"image_id": image_id}, {"$set": update_document}
+            )
             document = collection.find_one({"image_id": image_id})
             response = ImageRead(**document)
         except ImageNotFoundException:
-            response = JSONResponse(content={"message": "There is no image with that ID!"},
-                                    status_code=status.HTTP_404_NOT_FOUND)
+            response = JSONResponse(
+                content={"message": "There is no image with that ID!"},
+                status_code=status.HTTP_404_NOT_FOUND
+            )
         return response
 
     @staticmethod
@@ -107,14 +122,21 @@ class ImageRepository:
             if not document:
                 raise ImageNotFoundException(image_id)
             collection.delete_one({"image_id": image_id})
-            response = JSONResponse(content={"message": "Successfully deleted!"}, status_code=status.HTTP_200_OK)
+            response = JSONResponse(
+                content={"message": "Successfully deleted!"},
+                status_code=status.HTTP_200_OK
+            )
         except ImageNotFoundException:
-            response = JSONResponse(content={"message": "There is no image with that ID!"},
-                                    status_code=status.HTTP_404_NOT_FOUND)
+            response = JSONResponse(
+                content={"message": "There is no image with that ID!"},
+                status_code=status.HTTP_404_NOT_FOUND
+            )
         return response
 
     @staticmethod
     def find(text_to_find: str) -> ImagesRead:
         """Finds images with the corresponding text on them"""
-        cursor = collection.find({"text": {"$regex": text_to_find, "$options": "i"}})
+        cursor = collection.find(
+            {"text": {"$regex": text_to_find, "$options": "i"}}
+        )
         return [ImageRead(**document) for document in cursor]
