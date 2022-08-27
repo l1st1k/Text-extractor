@@ -12,7 +12,9 @@ app = FastAPI()
     "/images",
     response_model=ImagesRead,
     description="List all the images",
-    tags=["Images"]
+    tags=[
+        "Images"
+    ]
 )
 def _list_images():
     return ImageRepository.list()
@@ -24,7 +26,9 @@ def _list_images():
     description="Get a single picture by its unique ID",
     responses=get_exception_responses(ImageNotFoundException),
     status_code=status.HTTP_200_OK,
-    tags=["Image"]
+    tags=[
+        "Image"
+    ]
 )
 def _get_image(image_id: str):
     return ImageRepository.get(image_id=image_id)
@@ -35,7 +39,9 @@ def _get_image(image_id: str):
     response_class=JSONResponse,
     description="Upload a new image",
     status_code=status.HTTP_201_CREATED,
-    tags=["Image"]
+    tags=[
+        "Image"
+    ]
 )
 def _upload_image(file: UploadFile):
     return ImageRepository.create(file=file)
@@ -46,7 +52,9 @@ def _upload_image(file: UploadFile):
     response_class=JSONResponse or ImageRead,
     description="Update title/description for the image",
     status_code=status.HTTP_200_OK,
-    tags=["Image"]
+    tags=[
+        "Image"
+    ]
 )
 def _update_image(image_id: str, update: ImageUpdate):
     return ImageRepository.update(image_id=image_id, update=update)
@@ -57,7 +65,9 @@ def _update_image(image_id: str, update: ImageUpdate):
     response_class=JSONResponse,
     description="Delete the image",
     status_code=status.HTTP_200_OK,
-    tags=["Image"]
+    tags=[
+        "Image"
+    ]
 )
 def _delete_image(image_id: str):
     return ImageRepository.delete(image_id=image_id)
@@ -67,7 +77,9 @@ def _delete_image(image_id: str):
     "/images/search",
     response_model=ImagesRead,
     description="Finds all the images, that have corresponding text on them",
-    tags=["Images"]
+    tags=[
+        "Images"
+    ]
 )
 def _search_images(text: TextToFind):
     return ImageRepository.find(text_to_find=text.text)
