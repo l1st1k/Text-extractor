@@ -1,4 +1,5 @@
 import base64
+import logging
 import os
 from glob import glob
 from uuid import uuid4
@@ -8,6 +9,7 @@ from PIL import Image
 
 __all__ = ("get_uuid", "clear_pictures", "b64_to_image", "get_text_from_image")
 tess.pytesseract.tesseract_cmd = r'/usr/bin/tesseract'
+logging.basicConfig(level=logging.DEBUG)
 
 
 def get_uuid() -> str:
@@ -20,7 +22,7 @@ def clear_pictures() -> None:
     removing_files = glob('./*.jpg') + glob('./*.png') + glob('./*.jpeg')
     for i in removing_files:
         os.remove(i)
-    print("[INFO]   ALL LOCAL PICTURES ARE CLEARED SUCCESSFULLY!")
+    logging.info("ALL LOCAL PICTURES ARE CLEARED SUCCESSFULLY!")
 
 
 def b64_to_image(title: str, b64_str: bytes) -> None:
